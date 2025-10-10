@@ -71,24 +71,34 @@ public class ExamenParametrosDAO extends MySQLConnection {
 
     public boolean add(ExamenParametros exaParametro) {
         PreparedStatement ps = null;
+        PreparedStatement psMax = null;
+        ResultSet rs = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
-        String sql = "INSERT INTO examen_parametros (ep_id, ep_exa_id, ep_para_id, ep_consecutivo) VALUES (?, ?, ?, ?)";
-        System.out.println(exaParametro);
+
         try {
+            String sqlMax = "SELECT IFNULL(MAX(ep_id), 0) + 1 AS newId FROM examen_parametros";
+            psMax = con.prepareStatement(sqlMax);
+            rs = psMax.executeQuery();
+
+            int newId = 1;
+            if (rs.next()) {
+                newId = rs.getInt("newId");
+            }
+
+            String sql = "INSERT INTO examen_parametros (ep_id, ep_exa_id, ep_para_id, ep_consecutivo) VALUES (?, ?, ?, 0)";
             ps = con.prepareStatement(sql);
-            ps.setInt(1, exaParametro.getEp_id());
+            ps.setInt(1, newId);
             ps.setInt(2, exaParametro.getEp_exa_id());
             ps.setInt(3, exaParametro.getEp_para_id());
-            ps.setInt(4, exaParametro.getEp_consecutivo());
-            ps.execute();
+            ps.executeUpdate();
 
             return true;
         } catch (SQLException e) {
-            System.err.println(e);
+            System.err.println("Error al insertar examen_parametros: " + e);
             return false;
         } finally {
-            //con.desconectar();
+            // con.desconectar();
         }
     }
 

@@ -8,10 +8,6 @@ import Controller.CtrlExamen;
 import DAO.ExamenDAO;
 import Model.Examen;
 import View.frmExamen;
-import Controller.CtrlExamenParametros;
-import DAO.ExamenParametrosDAO;
-import Model.ExamenParametros;
-import View.frmExamenParametros;
 import Controller.CtrlParametros;
 import DAO.ParametrosDAO;
 import Model.Parametros;
@@ -33,13 +29,6 @@ public class Veterinaria {
         CtrlExamen examenController = new CtrlExamen(examenModel, examenDAO, examenView);
         examenController.iniciar();
         examenView.setVisible(true);
-
-        ExamenParametros examenParametrosModel = new ExamenParametros();
-        frmExamenParametros examenParametrosView = new frmExamenParametros();
-        ExamenParametrosDAO examenParametrosDAO = new ExamenParametrosDAO();
-        CtrlExamenParametros examenParametrosController = new CtrlExamenParametros(examenParametrosModel, examenParametrosDAO, examenParametrosView);
-        examenParametrosController.iniciar();
-        examenParametrosView.setVisible(true);
 
         Parametros parametrosModel = new Parametros();
         frmParametros parametrosView = new frmParametros();

@@ -9,7 +9,6 @@ import Model.Examen;
 import View.frmExamen;
 import DAO.ExamenParametrosDAO;
 import Model.ExamenParametros;
-import View.frmExamenParametros;
 import Model.Parametros;
 import DAO.ParametrosDAO;
 import View.frmParametros;
@@ -115,13 +114,13 @@ public class CtrlExamen implements ActionListener {
                     JOptionPane.showMessageDialog(null, "No fue posible eliminar el registro.");
                 }
             }
+            if (e.getSource() == vista.btnAddParam) {
+                Parametros objParam = vista.cmbParam.getItemAt(vista.cmbParam.getSelectedIndex());
+                addParam(id, objParam);
+            }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "El campo ID y valor deben ser un número entero válido.");
             return;
-        }
-        if (e.getSource() == vista.btnAddParam) {
-            Parametros objParam = vista.cmbParam.getItemAt(vista.cmbParam.getSelectedIndex());
-            addParam(objParam);
         }
     }
 
@@ -201,23 +200,22 @@ public class CtrlExamen implements ActionListener {
         }
     }
 
-    public void addParam(Parametros objParam) {
-        DefaultTableModel model = (DefaultTableModel) vista.jtbParam.getModel();
-        model.addRow(new Object[]{objParam.getPara_id(), objParam.getPara_descripcion()});
+    public void addParam(int exaId, Parametros objParam) {
+        ExamenParametros paramExam = new ExamenParametros(exaId, objParam.getPara_id());
+        ExamenParametros modelExamParam = new ExamenParametros();
+        ExamenParametrosDAO consultExamParam = new ExamenParametrosDAO();
+        CtrlExamenParametros ctrlObject = new CtrlExamenParametros(modelExamParam, consultExamParam);
+        ctrlObject.add(paramExam);
+        getParamJTable(exaId);
     }
-    
+
     public void getParamJTable(int examId) {
         ExamenParametros modelExamParam = new ExamenParametros();
         ExamenParametrosDAO consultExamParam = new ExamenParametrosDAO();
-        frmExamenParametros viewExamParam = new frmExamenParametros();
-        CtrlExamenParametros ctrlObject = new CtrlExamenParametros(modelExamParam, consultExamParam, viewExamParam);
+        CtrlExamenParametros ctrlObject = new CtrlExamenParametros(modelExamParam, consultExamParam);
         List<Parametros> parametros = ctrlObject.getParamByExamId(examId);
         DefaultTableModel model = (DefaultTableModel) vista.jtbParam.getModel();
         model.setRowCount(0);
-        model.removeRow(0);
-        model.removeRow(0);
-        model.removeRow(0);
-        System.out.println(model);
         for (Parametros paramItem : parametros) {
             model.addRow(new Object[]{paramItem.getPara_id(), paramItem.getPara_descripcion()});
         }

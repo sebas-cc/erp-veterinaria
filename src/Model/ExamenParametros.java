@@ -9,12 +9,18 @@ package Model;
  * @author Zeth
  */
 public class ExamenParametros {
+
     int ep_id;
     int ep_exa_id;
     int ep_para_id;
     int ep_consecutivo;
 
     public ExamenParametros() {
+    }
+
+    public ExamenParametros(int ep_exa_id, int ep_para_id) {
+        this.ep_exa_id = ep_exa_id;
+        this.ep_para_id = ep_para_id;
     }
 
     public int getEp_id() {
@@ -49,6 +55,4 @@ public class ExamenParametros {
         this.ep_consecutivo = ep_consecutivo;
     }
 
-    
-    
 }

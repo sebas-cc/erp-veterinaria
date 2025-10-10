@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package View;
+
 import Controller.CtrlExamen;
 import DAO.ExamenDAO;
 import Model.Examen;
@@ -14,14 +15,20 @@ import Model.TipoExamen;
  * @author Zeth
  */
 public class frmExamen extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(frmExamen.class.getName());
 
     /**
      * Creates new form frmExamen
      */
+    
+    private CtrlExamen ctrlExamen;
+    
     public frmExamen() {
         initComponents();
+        Examen model = new Examen();
+        ExamenDAO dao = new ExamenDAO();
+        ctrlExamen = new CtrlExamen(model, dao, this);
     }
 
     /**
@@ -190,13 +197,8 @@ public class frmExamen extends javax.swing.JFrame {
         txtValue.setText(valor);
         cmbState.setSelectedItem(estado);
         cmbType.setSelectedItem(tipo);
-        
-        Examen modelParam = new Examen();
-        ExamenDAO consultParam = new ExamenDAO();
-        frmExamen viewParam = new frmExamen();
-        CtrlExamen ctrlObject = new CtrlExamen(modelParam, consultParam, viewParam);
-        ctrlObject.getParamJTable(Integer.parseInt(id));
-        System.out.println(ctrlObject);
+
+        ctrlExamen.getParamJTable(Integer.parseInt(id));
     }//GEN-LAST:event_jtbListMouseClicked
 
     private void txtValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtValueActionPerformed
