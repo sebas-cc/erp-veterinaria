@@ -30,6 +30,20 @@ public class Parametros {
         this.para_descripcion = para_descripcion;
     }
 
+    public Parametros(int para_id, String para_descripcion, String para_unidad, String para_estado, String usu_crea, String fecha_crea, String para_usu_anu, String para_fecha_anu, String para_formula, String para_referencia1, String para_referencia2) {
+        this.para_id = para_id;
+        this.para_descripcion = para_descripcion;
+        this.para_unidad = para_unidad;
+        this.para_estado = para_estado;
+        this.usu_crea = usu_crea;
+        this.fecha_crea = fecha_crea;
+        this.para_usu_anu = para_usu_anu;
+        this.para_fecha_anu = para_fecha_anu;
+        this.para_formula = para_formula;
+        this.para_referencia1 = para_referencia1;
+        this.para_referencia2 = para_referencia2;
+    }
+ 
     public int getPara_id() {
         return para_id;
     }

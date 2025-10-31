@@ -7,14 +7,14 @@ package Controller;
 import DAO.ExamenDAO;
 import Model.Examen;
 import View.frmExamen;
-import DAO.ExamenParametrosDAO;
-import Model.ExamenParametros;
 import Model.Parametros;
 import DAO.ParametrosDAO;
+import Model.ExamenParametros;
 import View.frmParametros;
 import Model.TipoExamen;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -40,8 +40,6 @@ public class CtrlExamen implements ActionListener {
     }
 
     public void iniciar() {
-        vista.setTitle("Examenes");
-        vista.setLocationRelativeTo(null);
         getJTable();
         getOptionTipo();
         getOptionParams();
@@ -53,8 +51,9 @@ public class CtrlExamen implements ActionListener {
             int id = Integer.parseInt(vista.txtId.getText().trim());
             int valor = Integer.parseInt(vista.txtValue.getText().trim());
             String descripcion = vista.txtNombre.getText().trim();
-            String tipo = vista.cmbType.getSelectedItem().toString();
+            String tipo = Integer.toString(vista.cmbType.getItemAt(vista.cmbType.getSelectedIndex()).getTipoExaId());
             String estado = vista.cmbState.getSelectedItem().toString();
+            List<Parametros> listParams = getCurrentParamJTable();
 
             if (e.getSource() == vista.btnAdd) {
                 model.setId(id);
@@ -65,14 +64,15 @@ public class CtrlExamen implements ActionListener {
                 vista.cmbState.setEnabled(false);
 
                 //Validaciones
-                if (!addValidation(id, valor, descripcion, tipo, estado)) {
+                if (!addValidation(id, valor, descripcion, tipo, estado, listParams)) {
                     return;
                 }
 
                 //Ingreso de datos
                 if (consult.add(model)) {
-                    JOptionPane.showMessageDialog(null, "Registro guardado.");
+                    addExamParam(id, listParams);
                     getJTable();
+                    JOptionPane.showMessageDialog(null, "Registro guardado.");
                 } else {
                     JOptionPane.showMessageDialog(null, "No fue posible realizar el registro.");
                 }
@@ -116,7 +116,7 @@ public class CtrlExamen implements ActionListener {
             }
             if (e.getSource() == vista.btnAddParam) {
                 Parametros objParam = vista.cmbParam.getItemAt(vista.cmbParam.getSelectedIndex());
-                addParam(id, objParam);
+                addParam(objParam);
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "El campo ID y valor deben ser un número entero válido.");
@@ -124,7 +124,7 @@ public class CtrlExamen implements ActionListener {
         }
     }
 
-    private boolean addValidation(int id, int valor, String descripcion, String tipo, String estado) {
+    private boolean addValidation(int id, int valor, String descripcion, String tipo, String estado, List<Parametros> listParams) {
         if (descripcion.isEmpty()) {
             JOptionPane.showMessageDialog(null, "La descripción no puede estar vacía.");
             return false;
@@ -139,6 +139,10 @@ public class CtrlExamen implements ActionListener {
         }
         if (consult.compareDescripcion(model)) {
             JOptionPane.showMessageDialog(null, "La descripción no puede repetirse.");
+            return false;
+        }
+        if (listParams.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El examen debe de contener 1 parametro como minimo.");
             return false;
         }
 
@@ -158,7 +162,7 @@ public class CtrlExamen implements ActionListener {
             JOptionPane.showMessageDialog(null, "El tipo no puede estar vacío.");
             return false;
         }
-        if (estado == "Anulado") {
+        if ("Anulado".equals(estado)) {
             JOptionPane.showMessageDialog(null, "El estado debe ser Activo para ser actualizado.");
             return false;
         }
@@ -171,7 +175,7 @@ public class CtrlExamen implements ActionListener {
     }
 
     private boolean deleteValidation(String estado) {
-        if (estado == "Anulado") {
+        if ("Anulado".equals(estado)) {
             JOptionPane.showMessageDialog(null, "El registro ya se encuetra anulado.");
             return false;
         }
@@ -200,34 +204,68 @@ public class CtrlExamen implements ActionListener {
         }
     }
 
-    public void addParam(int exaId, Parametros objParam) {
-        ExamenParametros paramExam = new ExamenParametros(exaId, objParam.getPara_id());
-        ExamenParametros modelExamParam = new ExamenParametros();
-        ExamenParametrosDAO consultExamParam = new ExamenParametrosDAO();
-        CtrlExamenParametros ctrlObject = new CtrlExamenParametros(modelExamParam, consultExamParam);
-        ctrlObject.add(paramExam);
-        getParamJTable(exaId);
+    public void addParam(Parametros objParam) {
+        DefaultTableModel paramTable = (DefaultTableModel) vista.jtbParam.getModel();
+        paramTable.addRow(new Object[]{objParam.getPara_id(), objParam.getPara_descripcion()});
     }
 
     public void getParamJTable(int examId) {
-        ExamenParametros modelExamParam = new ExamenParametros();
-        ExamenParametrosDAO consultExamParam = new ExamenParametrosDAO();
-        CtrlExamenParametros ctrlObject = new CtrlExamenParametros(modelExamParam, consultExamParam);
+        CtrlExamenParametros ctrlObject = new CtrlExamenParametros();
         List<Parametros> parametros = ctrlObject.getParamByExamId(examId);
-        DefaultTableModel model = (DefaultTableModel) vista.jtbParam.getModel();
-        model.setRowCount(0);
+        DefaultTableModel paramTable = (DefaultTableModel) vista.jtbParam.getModel();
+        paramTable.setRowCount(0);
         for (Parametros paramItem : parametros) {
-            model.addRow(new Object[]{paramItem.getPara_id(), paramItem.getPara_descripcion()});
+            paramTable.addRow(new Object[]{paramItem.getPara_id(), paramItem.getPara_descripcion()});
         }
     }
 
-    public void getJTable() {
-        List<Examen> examenes = consult.getAllExamenes();
-        DefaultTableModel model = (DefaultTableModel) vista.jtbList.getModel();
-        model.setRowCount(0);
+    public List<Parametros> getCurrentParamJTable() {
+        DefaultTableModel tableParam = (DefaultTableModel) vista.jtbParam.getModel();
+        List<Parametros> listParams = new ArrayList();
 
-        for (Examen examenItem : examenes) {
-            model.addRow(new Object[]{examenItem.getId(), examenItem.getDescripcion(), examenItem.getValor(), examenItem.getTipo(), examenItem.getEstado()});
+        for (int i = 0; i < tableParam.getRowCount(); i++) {
+            // Obtenemos los valores de las columnas
+            Object idObj = tableParam.getValueAt(i, 0);      // Columna del id
+            Object nombreObj = tableParam.getValueAt(i, 1);  // Columna del nombre
+
+            // Convertimos los valores al tipo correcto
+            int id = 0;
+            if (idObj != null && !idObj.toString().isEmpty()) {
+                id = Integer.parseInt(idObj.toString());
+            }
+            String nombre = nombreObj != null ? nombreObj.toString() : "";
+
+            Parametros parametro = new Parametros(id, nombre);
+            listParams.add(parametro);
         }
+        
+        return listParams;
+    }
+
+    public void getJTable() {
+        // Inizialización de la tabla Parametros
+        DefaultTableModel paramTable = (DefaultTableModel) vista.jtbParam.getModel();
+        paramTable.setRowCount(0);
+        // Inizialización de la tabla Examenes
+        List<Examen> examenes = consult.getAllExamenes();
+        DefaultTableModel examTable = (DefaultTableModel) vista.jtbList.getModel();
+        examTable.setRowCount(0);
+        for (Examen examenItem : examenes) {
+            examTable.addRow(new Object[]{examenItem.getId(), examenItem.getDescripcion(), examenItem.getValor(), examenItem.getTipo(), examenItem.getEstado()});
+        }
+    }
+
+    private void addExamParam(int id, List<Parametros> listParams) {
+        CtrlExamenParametros ctrlExamParam = new CtrlExamenParametros();
+        List<Parametros> parametrosActuales = ctrlExamParam.getParamByExamId(id);
+        if (!parametrosActuales.isEmpty()) {
+            listParams.removeAll(parametrosActuales);
+        }
+        List<ExamenParametros> listExamParam = new ArrayList<>();
+        for (Parametros objParam : listParams) {
+            ExamenParametros examParam = new ExamenParametros(id, objParam.getPara_id());
+            listExamParam.add(examParam);
+        }
+        ctrlExamParam.add(listExamParam);
     }
 }

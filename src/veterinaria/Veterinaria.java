@@ -9,9 +9,12 @@ import DAO.ExamenDAO;
 import Model.Examen;
 import View.frmExamen;
 import Controller.CtrlParametros;
+import Controller.CtrlPrincipal;
 import DAO.ParametrosDAO;
 import Model.Parametros;
+import View.frmMenu;
 import View.frmParametros;
+import com.formdev.flatlaf.IntelliJTheme;
 
 /**
  *
@@ -23,6 +26,7 @@ public class Veterinaria {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        /*
         Examen examenModel = new Examen();
         frmExamen examenView = new frmExamen();
         ExamenDAO examenDAO = new ExamenDAO();
@@ -35,7 +39,13 @@ public class Veterinaria {
         ParametrosDAO parametrosDAO = new ParametrosDAO();
         CtrlParametros parametrosController = new CtrlParametros(parametrosModel, parametrosDAO, parametrosView);
         parametrosController.iniciar();
-        parametrosView.setVisible(true);
+        parametrosView.setVisible(true);*/
+        
+        IntelliJTheme.setup(Veterinaria.class.getResourceAsStream("/dark.theme.json"));
+        frmMenu objView = new frmMenu();
+        CtrlPrincipal objCtrlPrincipal = new CtrlPrincipal(objView);
+        objCtrlPrincipal.iniciar();
+        objView.setVisible(true);
     }
 
 }

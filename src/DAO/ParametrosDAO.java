@@ -24,6 +24,7 @@ public class ParametrosDAO extends MySQLConnection {
         String sql = "SELECT para_id, para_descripcion, para_unidad, para_estado, usu_crea, fecha_crea, para_usu_anu, para_fecha_anu, para_formula, para_referencia1, para_referencia2 FROM parametros";
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Obteniendo Parametros...");
         try {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -54,8 +55,8 @@ public class ParametrosDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Agregando Parametro...");
         String sql = "INSERT INTO parametros(para_id, para_descripcion, para_unidad, para_estado, para_formula, para_referencia1, para_referencia2) VALUES(?,?,?,?,?,?,?,?,?,?)";
-        System.out.println(parametro);
         try {
             ps = con.prepareStatement(sql);
             ps.setInt(1, parametro.getPara_id());
@@ -81,6 +82,7 @@ public class ParametrosDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Actualizando Parametro...");
         String sql = "UPDATE parametros SET para_descripcion=?, para_unidad=?, para_estado=?, usu_crea=?, para_usu_anu=?, para_fecha_anu=?, para_formula=?, para_referencia1=?, para_referencia2=? WHERE para_id=?";
         try {
             ps = con.prepareStatement(sql);
@@ -103,6 +105,7 @@ public class ParametrosDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Eliminando Parametro...");
         String sql = "DELETE FROM parametros WHERE para_id=?";
         try {
             ps = con.prepareStatement(sql);

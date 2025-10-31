@@ -25,6 +25,7 @@ public class ExamenParametrosDAO extends MySQLConnection {
         String sql = "SELECT ep_id, ep_exa_id, ep_para_id, ep_consecutivo FROM `examen_parametros`";
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Obtenido Examen_Parametros...");
         try {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -51,6 +52,7 @@ public class ExamenParametrosDAO extends MySQLConnection {
         String sql = "SELECT para_id, para_descripcion FROM parametros WHERE para_id IN ( SELECT ep_para_id FROM examen_parametros WHERE ep_exa_id = ? );";
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Obteniendo Examen_Parametro por ID...");
         try {
             ps = con.prepareStatement(sql);
             ps.setInt(1, examenId);
@@ -69,13 +71,13 @@ public class ExamenParametrosDAO extends MySQLConnection {
         return listParam;
     }
 
-    public boolean add(ExamenParametros exaParametro) {
+    public boolean add(List<ExamenParametros> listExamParam) {
         PreparedStatement ps = null;
         PreparedStatement psMax = null;
         ResultSet rs = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
-
+        System.out.println("Agregando Examen_Parametro...");
         try {
             String sqlMax = "SELECT IFNULL(MAX(ep_id), 0) + 1 AS newId FROM examen_parametros";
             psMax = con.prepareStatement(sqlMax);
@@ -86,14 +88,28 @@ public class ExamenParametrosDAO extends MySQLConnection {
                 newId = rs.getInt("newId");
             }
 
-            String sql = "INSERT INTO examen_parametros (ep_id, ep_exa_id, ep_para_id, ep_consecutivo) VALUES (?, ?, ?, 0)";
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, newId);
-            ps.setInt(2, exaParametro.getEp_exa_id());
-            ps.setInt(3, exaParametro.getEp_para_id());
-            ps.executeUpdate();
+            StringBuilder sql = new StringBuilder("INSERT INTO examen_parametros (ep_id, ep_exa_id, ep_para_id, ep_consecutivo) VALUES ");
 
+            for (int i = 0; i < listExamParam.size(); i++) {
+                sql.append("(?, ?, ?, 0)");
+                if (i < listExamParam.size() - 1) {
+                    sql.append(", ");
+                }
+            }
+
+            ps = con.prepareStatement(sql.toString());
+
+            // Se incrementa la posicion de cada objeto en orden
+            int index = 1;
+            for (ExamenParametros obj : listExamParam) {
+                ps.setInt(index++, newId++);
+                ps.setInt(index++, obj.getEp_exa_id());
+                ps.setInt(index++, obj.getEp_para_id());
+            }
+
+            ps.executeUpdate();
             return true;
+
         } catch (SQLException e) {
             System.err.println("Error al insertar examen_parametros: " + e);
             return false;
@@ -106,6 +122,7 @@ public class ExamenParametrosDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Actualizando Examen_Parametro...");
         String sql = "UPDATE examen_parametros SET ep_exa_id=?, ep_para_id=?, ep_consecutivo=? WHERE ep_id=?";
         try {
             ps = con.prepareStatement(sql);
@@ -125,6 +142,7 @@ public class ExamenParametrosDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Eliminando Examen_Parametro...");
         String sql = "DELETE FROM examen_parametros WHERE ep_id=?";
         try {
             ps = con.prepareStatement(sql);

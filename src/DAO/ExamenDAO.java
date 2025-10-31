@@ -20,9 +20,10 @@ public class ExamenDAO extends MySQLConnection {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Examen> listExamenes = new ArrayList<>();
-        String sql = "SELECT exa_id, exa_descripcion, exa_valor, exa_tipo, exa_estado FROM `examen`";
+        String sql = "SELECT e.exa_id, e.exa_descripcion, e.exa_valor, te.tipoExa_descripcion AS tip_exa, e.exa_estado FROM examen e JOIN tipo_examen te ON e.exa_tipo = te.tipoExa_id;";
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Obteniendo Examenes...");
         try {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -31,7 +32,7 @@ public class ExamenDAO extends MySQLConnection {
                 objExamen.setId(rs.getInt("exa_id"));
                 objExamen.setDescripcion(rs.getString("exa_descripcion"));
                 objExamen.setValor(rs.getInt("exa_valor"));
-                objExamen.setTipo(rs.getString("exa_tipo"));
+                objExamen.setTipo(rs.getString("tip_exa"));
                 objExamen.setEstado(rs.getString("exa_estado"));
                 listExamenes.add(objExamen);
             }
@@ -47,8 +48,8 @@ public class ExamenDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Agregando Examen...");
         String sql = "insert into examen(exa_id, exa_descripcion, exa_valor, exa_tipo, exa_estado) values(?,?,?,?,?)";
-        System.out.println(examen);
         try {
             ps = con.prepareStatement(sql);
             ps.setInt(1, examen.getId());
@@ -71,6 +72,7 @@ public class ExamenDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Actualizando Examen...");
         String sql = "UPDATE examen SET exa_descripcion=?, exa_valor=?, exa_tipo=?, exa_estado=? WHERE exa_id=?";
         try {
             ps = con.prepareStatement(sql);
@@ -91,6 +93,7 @@ public class ExamenDAO extends MySQLConnection {
         PreparedStatement ps = null;
         MySQLConnection con = new MySQLConnection();
         con.conectar();
+        System.out.println("Anulando Examen...");
         //String sql = "DELETE FROM examen WHERE exa_id=? ";
         String sql = "UPDATE examen SET exa_estado='Anulado' WHERE exa_id=?";
         try {

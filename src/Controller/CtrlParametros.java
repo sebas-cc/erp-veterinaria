@@ -33,8 +33,6 @@ public class CtrlParametros implements ActionListener {
     }
 
     public void iniciar() {
-        vista.setTitle("Parametros");
-        vista.setLocationRelativeTo(null);
         getJTable();
     }
     

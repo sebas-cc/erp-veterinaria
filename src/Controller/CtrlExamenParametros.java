@@ -14,16 +14,15 @@ import java.util.List;
  */
 public class CtrlExamenParametros {
 
-    private final ExamenParametros model;
-    private final ExamenParametrosDAO consult;
+    private final ExamenParametros model = new ExamenParametros();
+    private final ExamenParametrosDAO consult = new ExamenParametrosDAO();
 
-    public CtrlExamenParametros(ExamenParametros model, ExamenParametrosDAO consult) {
-        this.model = model;
-        this.consult = consult;
+    public CtrlExamenParametros() {
+        
     }
     
-    public boolean add(ExamenParametros examParam) {
-        return consult.add(examParam);
+    public boolean add(List<ExamenParametros> listExamParam) {
+        return consult.add(listExamParam);
     }
     
     public List<Parametros> getParamByExamId(int examenId) {
