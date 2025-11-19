@@ -20,7 +20,7 @@ public class ExamenDAO extends MySQLConnection {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Examen> listExamenes = new ArrayList<>();
-        String sql = "SELECT e.exa_id, e.exa_descripcion, e.exa_valor, te.tipoExa_descripcion AS tip_exa, e.exa_estado FROM examen e JOIN tipo_examen te ON e.exa_tipo = te.tipoExa_id;";
+        String sql = "SELECT exa_id, exa_descripcion, exa_valor, exa_tipo, exa_estado FROM examen;";
         MySQLConnection con = new MySQLConnection();
         con.conectar();
         System.out.println("Obteniendo Examenes...");
@@ -32,7 +32,7 @@ public class ExamenDAO extends MySQLConnection {
                 objExamen.setId(rs.getInt("exa_id"));
                 objExamen.setDescripcion(rs.getString("exa_descripcion"));
                 objExamen.setValor(rs.getInt("exa_valor"));
-                objExamen.setTipo(rs.getString("tip_exa"));
+                objExamen.setTipo(rs.getString("exa_tipo"));
                 objExamen.setEstado(rs.getString("exa_estado"));
                 listExamenes.add(objExamen);
             }

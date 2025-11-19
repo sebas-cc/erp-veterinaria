@@ -86,12 +86,13 @@ public class CtrlExamen implements ActionListener {
                 model.setEstado(estado);
 
                 //Validaciones
-                if (!updateValidation(id, valor, descripcion, tipo, estado)) {
+                if (!updateValidation(id, valor, descripcion, tipo, estado, listParams)) {
                     return;
                 }
 
                 //Ingreso de datos
                 if (consult.update(model)) {
+                    addExamParam(id, listParams);
                     JOptionPane.showMessageDialog(null, "Registro actualizado.");
                     getJTable();
                 } else {
@@ -149,7 +150,7 @@ public class CtrlExamen implements ActionListener {
         return true;
     }
 
-    private boolean updateValidation(int id, int valor, String descripcion, String tipo, String estado) {
+    private boolean updateValidation(int id, int valor, String descripcion, String tipo, String estado, List<Parametros> listParams) {
         if (descripcion.isEmpty()) {
             JOptionPane.showMessageDialog(null, "La descripción no puede estar vacía.");
             return false;
@@ -168,6 +169,10 @@ public class CtrlExamen implements ActionListener {
         }
         if (consult.compareDescripcion(model)) {
             JOptionPane.showMessageDialog(null, "La descripción no puede repetirse.");
+            return false;
+        }
+        if (listParams.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El examen debe de contener 1 parametro como minimo.");
             return false;
         }
 

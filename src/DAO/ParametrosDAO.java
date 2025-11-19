@@ -56,7 +56,7 @@ public class ParametrosDAO extends MySQLConnection {
         MySQLConnection con = new MySQLConnection();
         con.conectar();
         System.out.println("Agregando Parametro...");
-        String sql = "INSERT INTO parametros(para_id, para_descripcion, para_unidad, para_estado, para_formula, para_referencia1, para_referencia2) VALUES(?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO parametros(para_id, para_descripcion, para_unidad, para_estado, para_formula, para_referencia1, para_referencia2, usu_crea, para_usu_anu) VALUES(?,?,?,?,?,?,?,?,?)";
         try {
             ps = con.prepareStatement(sql);
             ps.setInt(1, parametro.getPara_id());
@@ -66,6 +66,8 @@ public class ParametrosDAO extends MySQLConnection {
             ps.setString(5, parametro.getPara_formula());
             ps.setString(6, parametro.getPara_referencia1());
             ps.setString(7, parametro.getPara_referencia2());
+            ps.setString(8, "ADMIN");
+            ps.setString(9, "N/A");
 
             ps.execute();
 
@@ -83,7 +85,7 @@ public class ParametrosDAO extends MySQLConnection {
         MySQLConnection con = new MySQLConnection();
         con.conectar();
         System.out.println("Actualizando Parametro...");
-        String sql = "UPDATE parametros SET para_descripcion=?, para_unidad=?, para_estado=?, usu_crea=?, para_usu_anu=?, para_fecha_anu=?, para_formula=?, para_referencia1=?, para_referencia2=? WHERE para_id=?";
+        String sql = "UPDATE parametros SET para_descripcion=?, para_unidad=?, para_estado=?, para_formula=?, para_referencia1=?, para_referencia2=? WHERE para_id=?";
         try {
             ps = con.prepareStatement(sql);
             ps.setString(1, parametro.getPara_descripcion());
