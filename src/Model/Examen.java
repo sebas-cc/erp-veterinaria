@@ -19,6 +19,14 @@ public class Examen {
     public Examen() {
     }
 
+    public Examen(int id, String descripcion, int valor, String tipo, String estado) {
+        this.id = id;
+        this.descripcion = descripcion;
+        this.valor = valor;
+        this.tipo = tipo;
+        this.estado = estado;
+    }
+
     public int getId() {
         return id;
     }
@@ -58,4 +66,10 @@ public class Examen {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
+    @Override
+    public String toString() {
+        return descripcion;
+    }
+
 }

@@ -5,11 +5,14 @@
 package Controller;
 
 import DAO.ExamenDAO;
+import DAO.OrdenServicioDAO;
 import DAO.ParametrosDAO;
 import Model.Examen;
+import Model.OrdenServicio;
 import Model.Parametros;
 import View.frmExamen;
 import View.frmMenu;
+import View.frmOrdenServicio;
 import View.frmParametros;
 import com.formdev.flatlaf.FlatClientProperties;
 import java.awt.BorderLayout;
@@ -37,6 +40,7 @@ public class CtrlPrincipal implements ActionListener {
 
         vista.btnExamen.addActionListener(this);
         vista.btnParametro.addActionListener(this);
+        vista.btnReporte.addActionListener(this);
     }
 
     public void iniciar() {
@@ -58,9 +62,11 @@ public class CtrlPrincipal implements ActionListener {
         if (e.getSource() == vista.btnExamen) {
             cargarModuloExamen();
         }
-
         if (e.getSource() == vista.btnParametro) {
             cargarModuloParametros();
+        }
+        if (e.getSource() == vista.btnReporte) {
+            cargarModuloOrdenServicio();
         }
 
     }
@@ -122,6 +128,22 @@ public class CtrlPrincipal implements ActionListener {
             mostrarEnPanel(objView);
         } catch (Exception ex) {
             System.err.println("Error al cargar módulo de Parametro: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private void cargarModuloOrdenServicio() {
+        try {
+            OrdenServicio objModel = new OrdenServicio();
+            frmOrdenServicio objView = new frmOrdenServicio();
+            OrdenServicioDAO objDAO = new OrdenServicioDAO();
+            CtrlOrdenServicio objCtrl = new CtrlOrdenServicio(objModel, objDAO, objView);
+
+            objView.setControlador(objCtrl);
+            objCtrl.iniciar();
+            mostrarEnPanel(objView);
+        } catch (Exception ex) {
+            System.err.println("Error al cargar módulo de Orden de Servicio: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

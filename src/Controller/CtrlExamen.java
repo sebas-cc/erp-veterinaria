@@ -45,6 +45,18 @@ public class CtrlExamen implements ActionListener {
         getOptionParams();
     }
 
+    public CtrlExamen() {
+        this.model = new Examen(); 
+        this.consult = new ExamenDAO(); 
+        this.vista = null; 
+    }
+    
+    public List<Examen> getAllExamenes() {
+        ExamenDAO objExamen = new ExamenDAO();
+        return objExamen.getAllExamenes();
+    }
+    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
