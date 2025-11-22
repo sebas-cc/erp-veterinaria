@@ -56,4 +56,8 @@ class MySQLConnection {
         }
         return con.prepareStatement(sql);
     }
+
+    public Connection getConexion() {
+        return con;
+    }
 }

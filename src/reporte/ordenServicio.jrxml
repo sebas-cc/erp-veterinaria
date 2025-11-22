@@ -1,0 +1,278 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="ordenServicio" language="java" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0bdfee1a-41bd-4387-80e7-4a4639d61bec">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="labpetsMySQL"/>
+	<parameter name="id_orden" class="java.lang.String"/>
+	<query language="SQL"><![CDATA[SELECT 
+    os.os_id AS orden_id,
+    os.os_fecha AS fecha_orden,
+    os.os_valor_total AS valor_total_orden,
+
+    m.mas_nombre AS mascota_nombre,
+    m.mas_edad AS mascota_edad,
+    m.mas_sexo AS mascota_sexo,
+    r.raza_descripcion AS mascota_raza,
+    e.esp_descripcion AS mascota_especie,
+    os.os_mas_propietario AS propietario_nombre,
+
+    v.vet_nombre AS veterinario_nombre,
+    v.vet_veterinaria AS nombre_veterinaria,
+    v.vet_direccion AS veterinaria_direccion,
+    v.vet_tel AS veterinaria_telefono,
+    v.vet_email AS veterinaria_email,
+
+    -- Examen
+    ex.exa_id,
+    ex.exa_descripcion AS examen_descripcion,
+    ex.exa_valor AS examen_valor,
+    
+    -- Parámetro
+    p.para_id,
+    p.para_descripcion AS parametro_descripcion,
+    p.para_unidad AS parametro_unidad,
+    p.para_referencia1 AS referencia_1,
+    p.para_referencia2 AS referencia_2,
+
+    -- Resultado específico para este Parámetro y Examen en la Orden
+    osr.osr_resultado 
+
+FROM orden_servicio os
+INNER JOIN mascota m ON m.mas_id = os.os_mas_id
+INNER JOIN raza r ON r.raza_id = m.raza_id
+INNER JOIN especie e ON e.esp_id = r.esp_id
+INNER JOIN veterinario v ON v.vet_id = os.os_vet_id
+
+-- 1. Unimos a los detalles de la orden (los exámenes solicitados)
+INNER JOIN orden_servicio_detalle d ON d.dos_os_id = os.os_id
+INNER JOIN examen ex ON ex.exa_id = d.dos_exa_id
+
+-- 2. Unimos a todos los parámetros que posee ese examen
+INNER JOIN examen_parametros ep ON ep.ep_exa_id = ex.exa_id
+INNER JOIN parametros p ON p.para_id = ep.ep_para_id
+
+-- 3. Unimos a la tabla de resultados. 
+--    Es crucial la unión triple: Orden + Examen (del detalle) + Parámetro
+LEFT JOIN orden_servicio_resultados osr
+        ON osr.os_id = os.os_id 
+       AND osr.dos_exa_id = d.dos_exa_id -- Se recomienda usar el ID del detalle (d.dos_exa_id) para ser más preciso.
+       AND osr.para_id = p.para_id
+
+WHERE os.os_id = $P{id_orden}
+
+ORDER BY ex.exa_descripcion, ep.ep_consecutivo]]></query>
+	<field name="orden_id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="os_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="orden_id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orden_servicio"/>
+	</field>
+	<field name="fecha_orden" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="os_fecha"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_orden"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orden_servicio"/>
+	</field>
+	<field name="valor_total_orden" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="os_valor_total"/>
+		<property name="com.jaspersoft.studio.field.label" value="valor_total_orden"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orden_servicio"/>
+	</field>
+	<field name="mascota_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mas_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="mascota_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="mascota"/>
+	</field>
+	<field name="mascota_edad" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="mas_edad"/>
+		<property name="com.jaspersoft.studio.field.label" value="mascota_edad"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="mascota"/>
+	</field>
+	<field name="mascota_sexo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mas_sexo"/>
+		<property name="com.jaspersoft.studio.field.label" value="mascota_sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="mascota"/>
+	</field>
+	<field name="mascota_raza" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="raza_descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="mascota_raza"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="raza"/>
+	</field>
+	<field name="mascota_especie" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="esp_descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="mascota_especie"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="especie"/>
+	</field>
+	<field name="propietario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="os_mas_propietario"/>
+		<property name="com.jaspersoft.studio.field.label" value="propietario_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orden_servicio"/>
+	</field>
+	<field name="veterinario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vet_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="veterinario_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="nombre_veterinaria" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vet_veterinaria"/>
+		<property name="com.jaspersoft.studio.field.label" value="nombre_veterinaria"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="veterinaria_direccion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vet_direccion"/>
+		<property name="com.jaspersoft.studio.field.label" value="veterinaria_direccion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="veterinaria_telefono" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vet_tel"/>
+		<property name="com.jaspersoft.studio.field.label" value="veterinaria_telefono"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="veterinaria_email" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="vet_email"/>
+		<property name="com.jaspersoft.studio.field.label" value="veterinaria_email"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="veterinario"/>
+	</field>
+	<field name="exa_id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="exa_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="exa_id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="examen"/>
+	</field>
+	<field name="examen_descripcion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="exa_descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="examen_descripcion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="examen"/>
+	</field>
+	<field name="examen_valor" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="exa_valor"/>
+		<property name="com.jaspersoft.studio.field.label" value="examen_valor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="examen"/>
+	</field>
+	<field name="para_id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="para_id"/>
+		<property name="com.jaspersoft.studio.field.label" value="para_id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="parametros"/>
+	</field>
+	<field name="parametro_descripcion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="para_descripcion"/>
+		<property name="com.jaspersoft.studio.field.label" value="parametro_descripcion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="parametros"/>
+	</field>
+	<field name="parametro_unidad" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="para_unidad"/>
+		<property name="com.jaspersoft.studio.field.label" value="parametro_unidad"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="parametros"/>
+	</field>
+	<field name="referencia_1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="para_referencia1"/>
+		<property name="com.jaspersoft.studio.field.label" value="referencia_1"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="parametros"/>
+	</field>
+	<field name="referencia_2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="para_referencia2"/>
+		<property name="com.jaspersoft.studio.field.label" value="referencia_2"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="parametros"/>
+	</field>
+	<field name="osr_resultado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="osr_resultado"/>
+		<property name="com.jaspersoft.studio.field.label" value="osr_resultado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orden_servicio_resultados"/>
+	</field>
+	<background splitType="Stretch"/>
+	<title height="217" splitType="Stretch">
+		<element kind="textField" uuid="5a9c1a2e-f851-4d5f-9e90-496868aac3dd" x="120" y="30" width="100" height="30" fontSize="12.0">
+			<expression><![CDATA[$F{orden_id}]]></expression>
+		</element>
+		<element kind="staticText" uuid="207e11e0-2d1c-4a34-bbe1-abb6e789bc37" x="30" y="24" width="100" height="30" fontSize="16.0" bold="true">
+			<text><![CDATA[No Orden]]></text>
+		</element>
+		<element kind="rectangle" uuid="d75f6e10-e316-47fb-a576-317317ed2423" x="270" y="10" width="300" height="100"/>
+		<element kind="textField" uuid="ef277e14-df8c-4397-97d5-5d65f23167b4" x="420" y="46" width="100" height="30">
+			<expression><![CDATA[$F{veterinaria_email}]]></expression>
+		</element>
+		<element kind="textField" uuid="e10021b4-ab23-436d-b80c-de60d51bdad1" x="420" y="16" width="100" height="30">
+			<expression><![CDATA[$F{veterinaria_direccion}]]></expression>
+		</element>
+		<element kind="textField" uuid="748722ea-97d5-4e13-9cae-ced85483d099" x="420" y="76" width="100" height="30">
+			<expression><![CDATA[$F{veterinaria_telefono}]]></expression>
+		</element>
+		<element kind="image" uuid="4212d188-27de-4a9c-a8b0-3cc9ce128393" x="290" y="20" width="90" height="80">
+			<expression><![CDATA["C:/Users/Zeth/Downloads/labpets.png"]]></expression>
+		</element>
+		<element kind="textField" uuid="6d41f19c-8bab-4adc-a1e4-94f4dc84371d" x="120" y="137" width="100" height="30">
+			<expression><![CDATA[$F{fecha_orden}]]></expression>
+		</element>
+		<element kind="staticText" uuid="77fb869c-2147-4ad0-954b-c3d79b98d9da" x="20" y="137" width="100" height="30" fontSize="12.0" bold="true">
+			<text><![CDATA[fecha_orden]]></text>
+		</element>
+		<element kind="textField" uuid="47cbd818-a545-4001-963f-7e7d6d947246" x="440" y="137" width="100" height="30">
+			<expression><![CDATA[$F{mascota_nombre}]]></expression>
+		</element>
+		<element kind="staticText" uuid="59233127-a831-4285-9ae3-366e5751d36f" x="340" y="137" width="100" height="30" fontSize="12.0" bold="true">
+			<text><![CDATA[mascota_nombre]]></text>
+		</element>
+		<element kind="textField" uuid="3fffb266-7b96-44f4-988c-18a09d417a0f" x="120" y="177" width="100" height="30">
+			<expression><![CDATA[$F{propietario_nombre}]]></expression>
+		</element>
+		<element kind="staticText" uuid="7ce7816d-7ed9-4665-8937-d1268047f892" x="20" y="177" width="100" height="30" fontSize="12.0" bold="true">
+			<text><![CDATA[propietario_nombre]]></text>
+		</element>
+		<element kind="textField" uuid="dde15a2e-9788-4c82-86bc-1570c73593d5" x="440" y="177" width="100" height="30">
+			<expression><![CDATA[$F{mascota_especie}]]></expression>
+		</element>
+		<element kind="staticText" uuid="d16b659a-3ecc-4b43-b86b-da7bc6368e69" x="340" y="177" width="100" height="30" fontSize="12.0" bold="true">
+			<text><![CDATA[mascota_especie]]></text>
+		</element>
+		<element kind="textField" uuid="84f0c2e6-1821-443b-af51-557cc7dea974" x="130" y="76" width="100" height="30" fontSize="12.0">
+			<expression><![CDATA[$F{exa_id}]]></expression>
+		</element>
+		<element kind="staticText" uuid="6f68f277-c8e3-409a-9361-bc6082c38978" x="30" y="70" width="100" height="30" fontSize="16.0" bold="true">
+			<text><![CDATA[No Examen]]></text>
+		</element>
+	</title>
+	<detail>
+		<band height="210" splitType="Stretch">
+			<element kind="rectangle" uuid="e455cc63-b3a2-4a9e-a7cf-2ef8385b7148" x="10" y="10" width="270" height="60"/>
+			<element kind="rectangle" uuid="33d10df5-3c82-429f-8037-91fa5235cff9" x="280" y="10" width="270" height="60"/>
+			<element kind="rectangle" uuid="b96ca638-08a0-4128-99e3-caee7989826d" x="10" y="70" width="270" height="60"/>
+			<element kind="rectangle" uuid="420988e9-7040-4154-ac82-730264ead63a" x="280" y="70" width="270" height="60"/>
+			<element kind="rectangle" uuid="63bbeda5-f40f-4aeb-881c-be506991360e" x="10" y="130" width="270" height="60"/>
+			<element kind="rectangle" uuid="461695ad-acdf-480f-8146-9cf03ae9f969" x="280" y="130" width="270" height="60"/>
+			<element kind="textField" uuid="8830bf68-c2ff-4b8c-b7e4-e58482aa58db" x="160" y="30" width="100" height="30">
+				<expression><![CDATA[$F{parametro_descripcion}]]></expression>
+			</element>
+			<element kind="staticText" uuid="c1431e15-de4a-4508-9389-dfa5dbb29727" x="30" y="30" width="120" height="30">
+				<text><![CDATA[parametro_descripcion]]></text>
+			</element>
+			<element kind="textField" uuid="c5efc784-516b-4a50-8d5f-4c63fe73c57f" x="390" y="30" width="100" height="30">
+				<expression><![CDATA[$F{parametro_unidad}]]></expression>
+			</element>
+			<element kind="staticText" uuid="586ff17b-1e02-418d-b81e-2fc7e6dd7c9d" x="290" y="30" width="100" height="30">
+				<text><![CDATA[parametro_unidad]]></text>
+			</element>
+			<element kind="textField" uuid="cad20885-bb07-443a-aa63-ef60741b64c4" x="126" y="80" width="100" height="30">
+				<expression><![CDATA[$F{referencia_1}]]></expression>
+			</element>
+			<element kind="staticText" uuid="b84dadfa-88bd-44b5-bae2-a5235b878627" x="26" y="80" width="100" height="30">
+				<text><![CDATA[referencia_1]]></text>
+			</element>
+			<element kind="textField" uuid="17b4bd3f-3291-4ca4-8a3e-7177ee51e912" x="402" y="84" width="100" height="30">
+				<expression><![CDATA[$F{referencia_2}]]></expression>
+			</element>
+			<element kind="staticText" uuid="1ccaac40-7529-4b12-88d3-9d991c30cc67" x="302" y="84" width="100" height="30">
+				<text><![CDATA[referencia_2]]></text>
+			</element>
+			<element kind="textField" uuid="15e091dd-76f6-4064-bd41-3df3bf5fbbdb" x="126" y="145" width="100" height="30">
+				<expression><![CDATA[$F{osr_resultado}]]></expression>
+			</element>
+			<element kind="staticText" uuid="d8de3a38-4572-43de-b5bc-0615507dcf82" x="26" y="145" width="100" height="30">
+				<text><![CDATA[osr_resultado]]></text>
+			</element>
+		</band>
+	</detail>
+	<summary height="63" splitType="Stretch">
+		<element kind="textField" uuid="65c2befc-ed43-4479-9799-a1969b6bda29" x="270" y="26" width="100" height="30">
+			<expression><![CDATA[$F{valor_total_orden}]]></expression>
+		</element>
+		<element kind="staticText" uuid="6381fc45-3ea0-48b3-8f7b-5a82220f2087" x="187" y="20" width="100" height="30" fontSize="18.0" bold="true">
+			<text><![CDATA[TOTAL:]]></text>
+		</element>
+	</summary>
+</jasperReport>

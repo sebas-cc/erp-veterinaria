@@ -49,40 +49,37 @@ public class CtrlOrdenServicio implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            String fechaIni = vista.txtFechaIni.getText().trim();
-            String fechaFin = vista.txtFechaFin.getText().trim();
-            int idVet = vista.cmbVeterinario.getItemAt(vista.cmbVeterinario.getSelectedIndex()).getVet_id();
-            int idMasc = vista.cmbMascota.getItemAt(vista.cmbMascota.getSelectedIndex()).getMas_id();
-            int idExamen = vista.cmbExamen.getItemAt(vista.cmbExamen.getSelectedIndex()).getId();
-            String estado = vista.cmbEstado.getItemAt(vista.cmbEstado.getSelectedIndex());
-            String textoNoOrden = vista.txtOrden.getText().trim();
-            int noOrden = 0; // valor por defecto
-            if (!textoNoOrden.isEmpty()) {
-                noOrden = Integer.parseInt(textoNoOrden);
-            }
+        String fechaIni = vista.txtFechaIni.getText().trim();
+        String fechaFin = vista.txtFechaFin.getText().trim();
+        int idVet = vista.cmbVeterinario.getItemAt(vista.cmbVeterinario.getSelectedIndex()).getVet_id();
+        int idMasc = vista.cmbMascota.getItemAt(vista.cmbMascota.getSelectedIndex()).getMas_id();
+        int idExamen = vista.cmbExamen.getItemAt(vista.cmbExamen.getSelectedIndex()).getId();
+        String estado = vista.cmbEstado.getItemAt(vista.cmbEstado.getSelectedIndex());
+        String textoNoOrden = vista.txtOrden.getText().trim();
+        int noOrden = 0; // valor por defecto
+        if (!textoNoOrden.isEmpty()) {
+            noOrden = Integer.parseInt(textoNoOrden);
+        }
 
-            if (e.getSource() == vista.btnBuscar) {
+        if (e.getSource() == vista.btnBuscar) {
 
-                if (fechaIni.isEmpty() || fechaFin.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Fecha Inicio y Fecha Fin son campos obligatorios.");
-                    return;
-                }
-                List<OrdenServicio> listOrdServ = consult.search(fechaIni, fechaFin, idVet, idMasc, idExamen, estado, noOrden);
-                getJTable(listOrdServ);
+            if (fechaIni.isEmpty() || fechaFin.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Fecha Inicio y Fecha Fin son campos obligatorios.");
+                return;
             }
-            if (e.getSource() == vista.btnExportar) {
-                exportarPDF(fechaIni, fechaFin, idVet, idMasc, idExamen, estado, noOrden);
-            }
-            if (e.getSource() == vista.btnResultados) {
-                //TODO
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "El campo ID y valor deben ser un número entero válido.");
-            return;
+            List<OrdenServicio> listOrdServ = consult.search(fechaIni, fechaFin, idVet, idMasc, idExamen, estado, noOrden);
+            getJTable(listOrdServ);
+        }
+        if (e.getSource() == vista.btnExportar) {
+            exportarPDF(fechaIni, fechaFin, idVet, idMasc, idExamen, estado, noOrden);
+        }
+        if (e.getSource() == vista.btnResultados) {
+            int row = vista.jtbList.getSelectedRow();
+            int ordenId = Integer.parseInt(vista.jtbList.getValueAt(row, 0).toString());
+            consult.llamarInforme(ordenId);
         }
     }
-    
+
     public void exportarPDF(String fechaIni, String fechaFin, int idVet, int idMasc, int idExamen, String estado, int noOrden) {
         try {
             // Consultar las órdenes según filtros
@@ -147,7 +144,6 @@ public class CtrlOrdenServicio implements ActionListener {
         }
     }
 
-
     public void getOptionVeterinario() {
         CtrlVeterinario ctrlObject = new CtrlVeterinario();
         Veterinario allVet = new Veterinario();
@@ -177,7 +173,7 @@ public class CtrlOrdenServicio implements ActionListener {
         allExam.setDescripcion("Todos");
         vista.cmbExamen.addItem(allExam);
         for (Examen examenItem : ctrlObject.getAllExamenes()) {
-            vista.cmbExamen.addItem(new Examen(examenItem.getId(),examenItem.getDescripcion(),examenItem.getValor(),examenItem.getTipo(),examenItem.getEstado()));
+            vista.cmbExamen.addItem(new Examen(examenItem.getId(), examenItem.getDescripcion(), examenItem.getValor(), examenItem.getTipo(), examenItem.getEstado()));
         }
     }
 

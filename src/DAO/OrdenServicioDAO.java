@@ -5,18 +5,29 @@
 package DAO;
 
 import Model.OrdenServicio;
+import java.awt.Frame;
 import java.util.List;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Date;
+import java.sql.Connection;
+import java.util.HashMap;
+import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author Zeth
  */
 public class OrdenServicioDAO extends MySQLConnection {
+
+    private static final String RUTA_REPORTE = "./src/reporte/ordenServicio.jasper";
 
     public List<OrdenServicio> getAllOrdenServicio() {
         PreparedStatement ps = null;
@@ -101,7 +112,7 @@ public class OrdenServicioDAO extends MySQLConnection {
             if (noOrden != 0) {
                 ps.setInt(index++, noOrden);
             }
-            System.out.println(ps);
+
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -119,6 +130,38 @@ public class OrdenServicioDAO extends MySQLConnection {
         }
 
         return listOrdServ;
+    }
+
+    public void llamarInforme(int id_orden) {
+        MySQLConnection conexion = new MySQLConnection();
+        Connection con = null;
+        try {
+            con = conexion.conectar(); // Debe devolver java.sql.Connection
+
+            HashMap<String, Object> parametros = new HashMap<>();
+            parametros.put("id_orden", id_orden);
+
+            JasperPrint jp = JasperFillManager.fillReport(RUTA_REPORTE, parametros, con);
+
+            JasperViewer view = new JasperViewer(jp, false);
+            view.setTitle("Factura " + id_orden);
+            view.setExtendedState(Frame.MAXIMIZED_BOTH);
+            view.setVisible(true);
+
+        } catch (Exception e) {
+            System.err.println("Error al generar informe de factura: " + e.getMessage());
+            JOptionPane.showMessageDialog(null,
+                    "Ocurrió un error al generar la factura.\n" + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (con != null && !con.isClosed()) {
+                    con.close();
+                }
+            } catch (Exception ex) {
+                System.err.println("Error al cerrar conexión: " + ex.getMessage());
+            }
+        }
     }
 
 }
